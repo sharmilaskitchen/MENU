@@ -71,3 +71,4 @@ html[lang=si] .stamp{font-size:.8rem}
 @media(max-width:820px){.top{gap:10px;padding:10px 14px}.brand{font-size:1.1rem}.cartbtn{padding:8px 12px;font-size:.88rem}}
 [hidden]{display:none!important}
 .card.off img{filter:grayscale(1);opacity:.5}.card.off h3,.card.off .price{opacity:.55}.add:disabled{background:#8a8f87;cursor:not-allowed}
+.card{position:relative}.badge{position:absolute;top:12px;left:12px;z-index:1;font:700 .8rem "Hanken Grotesk","Noto Sans Sinhala",sans-serif;padding:5px 12px;border-radius:99px;color:#fff}.badge.yes{background:#1fa855}.badge.no{background:var(--chili)}

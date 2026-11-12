@@ -5,7 +5,7 @@ const WHATSAPP = "35796128522";
 const CURRENCY = "€";
 /* Menu control from Google Sheet (optional): paste your "Publish to web" CSV link between the quotes.
    Leave empty to show every item as available. */
-const SHEET_CSV = "";
+const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1WNGGblN6-aH2g0fN38DJQtTOLQ9K6fMzyiSMH1Hwiqk/gviz/tq?tqx=out:csv&gid=243207064";
 
 const T = {
  si:{
@@ -25,7 +25,7 @@ const T = {
   lNote:"විශේෂ දේවල් (කුළුබඩු ගාන, අසාත්මිකතා, වෙලාව)",total:"මුළු ගාණ",send:"WhatsApp එකෙන් ඕඩර් එක යවන්න",
   fine:"Delivery ගාස්තුවක් තියෙනවා නම් WhatsApp එකෙන් අපි කියන්නම්.",
   empty:"ඔයාගේ ඕඩර් එක හිස්. මෙනුවෙන් රසක් දාන්න!",each:"එකකට",add:"ඕඩර් එකට දාන්න",added:"දැම්මා ✓",
-  soldOut:"අද නැහැ",needName:"කරුණාකර නම ලියන්න",all:"සියල්ල",
+  soldOut:"අද නැහැ",aY:"අද තියෙනවා",aN:"අද නැහැ",needName:"කරුණාකර නම ලියන්න",all:"සියල්ල",
   cats:{rc:"බත් & කරි",dn:"ඩිනර් බොක්ස්",rh:"රොටි & ආප්ප"},
   hello:"ආයුබෝවන් ශාමිලා කිචන්! මට ඕඩර් එකක් දාන්න ඕන.",
   m1:"ආයුබෝවන් ශාමිලා කිචන්! මට මේ ඕඩර් එක දාන්න ඕන:",m2:"මුළු ගාණ",m3:"නම",m4:"ලිපිනය",m5:"සටහන",m6:"ස්තූතියි!",
@@ -48,7 +48,7 @@ const T = {
   lNote:"Notes (spice level, allergies, time)",total:"Total",send:"Send order on WhatsApp",
   fine:"Delivery costs, if any, are confirmed by us on WhatsApp.",
   empty:"Your order is empty. Add something from the menu.",each:"each",add:"Add to order",added:"Added ✓",
-  soldOut:"Sold out today",needName:"Please enter your name",all:"All",
+  soldOut:"Not available today",aY:"Available today",aN:"Not available today",needName:"Please enter your name",all:"All",
   cats:{rc:"Rice & curry",dn:"Dinner boxes",rh:"Roti & hoppers"},
   hello:"Hello Shamila Kitchen, I would like to place an order.",
   m1:"Hello Shamila Kitchen, I would like to order:",m2:"Total",m3:"Name",m4:"Address",m5:"Notes",m6:"Thank you!",
@@ -93,7 +93,7 @@ function renderTabs(){
 }
 function renderGrid(){
  $("#grid").innerHTML=MENU.filter(m=>tab==="all"||m.cat===tab).map(m=>`
- <article class="card${m.off?" off":""}"><img src="${IMG[m.img]}" alt="${m[lang].n}" loading="lazy">
+ <article class="card${m.off?" off":""}"><span class="badge ${m.off?"no":"yes"}" ${m.off===undefined?"hidden":""}>${m.off?t("aN"):t("aY")}</span><img src="${IMG[m.img]}" alt="${m[lang].n}" loading="lazy">
  <div class="body"><h3>${m[lang].n}</h3><span class="si2">${m[other()].n}</span><p>${m[lang].d}</p>
  <div class="buy"><span class="price">${money(m.price)}</span><button class="add" data-id="${m.id}"${m.off?" disabled":""}>${m.off?t("soldOut"):t("add")}</button></div></div></article>`).join("");
 }
@@ -144,11 +144,30 @@ $("#send").addEventListener("click",()=>{
  window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank","noopener");
 });
 applyLang();
-if(SHEET_CSV)fetch(SHEET_CSV+(SHEET_CSV.includes("?")?"&":"?")+"t="+Date.now()).then(r=>r.text()).then(txt=>{
- txt.trim().split(/\r?\n/).slice(1).forEach(r=>{
-  const [id,av,pr]=r.split(",").map(s=>s.trim().replace(/^"|"$/g,""));
-  const m=MENU.find(x=>x.id===id);if(!m)return;
-  m.off=/^(no|n|false|0|sold)/i.test(av||"");
-  if(pr&&!isNaN(+pr))m.price=+pr;
- });renderGrid();renderCart();}).catch(()=>{});
+function parseCSV(s){const rows=[];let r=[],c="",q=false;
+ for(let i=0;i<s.length;i++){const ch=s[i];
+  if(q){if(ch==='"'){if(s[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
+  else if(ch==='"')q=true;else if(ch===","){r.push(c);c=""}
+  else if(ch==="\n"){r.push(c);rows.push(r);r=[];c=""}else if(ch!=="\r")c+=ch}
+ if(c||r.length){r.push(c);rows.push(r)}return rows}
+function getCSV(u){
+ return fetch(u+(u.includes("?")?"&":"?")+"t="+Date.now(),{cache:"no-store"}).then(r=>{
+  if(!r.ok)throw new Error("HTTP "+r.status);return r.text()}).then(t=>{
+  if(/^\s*</.test(t))throw new Error("sheet is not public (got a web page, not CSV)");return t})}
+function loadSheet(){
+ if(!SHEET_CSV)return;
+ const alt=SHEET_CSV.replace("/gviz/tq?tqx=out:csv&","/export?format=csv&");
+ getCSV(SHEET_CSV).catch(e=>{dbg("Method 1 failed: "+e.message+" - trying method 2");return getCSV(alt)}).then(txt=>{
+  const rows=parseCSV(txt).map(r=>r.map(s=>s.trim()));
+  const H=rows.shift().map(s=>s.toLowerCase()),ci=H.indexOf("id"),ca=H.indexOf("available"),cp=H.indexOf("price");
+  if(ci<0||ca<0){dbg("Sheet read, but headers id/available not found: "+H.join("|"));return}
+  rows.forEach(r=>{
+   const m=MENU.find(x=>x.id===r[ci]);if(!m)return;
+   if(r[ca])m.off=/^(no|n|false|0|sold)/i.test(r[ca]);
+   if(cp>=0&&r[cp]&&!isNaN(+r[cp]))m.price=+r[cp];
+  });renderGrid();renderCart();dbg("Sheet OK: "+rows.length+" rows read");
+ }).catch(e=>dbg("Could not load sheet: "+e.message));
+}
+function dbg(m){console.warn("[sheet]",m);if(location.hash==="#debug"){let e=document.getElementById("dbg");if(!e){e=document.createElement("div");e.id="dbg";e.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:99;background:#000;color:#0f0;font:13px monospace;padding:8px";document.body.appendChild(e)}e.textContent=m}}
+loadSheet();setInterval(loadSheet,60000);
 document.getElementById("heroImg").src=IMG["rice-curry"];
