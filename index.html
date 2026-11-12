@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="si">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shamila Kitchen | Home-made Sri Lankan food, order on WhatsApp</title>
+<meta name="description" content="Rice & curry packets, dinner boxes, bittara roti, appa and isso wade. Home-made Sri Lankan food. Order on WhatsApp.">
+<meta name="theme-color" content="#12301f">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍛</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Hanken+Grotesk:wght@400;500;700&family=Noto+Sans+Sinhala:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#top" data-i="brand">ශාමිලා කිචන්</a>
+  <nav><a href="#menu" data-i="nMenu">මෙනුව</a><a href="#how" data-i="nHow">ඕඩර් කරන හැටි</a><a href="#contact" data-i="nContact">අමතන්න</a></nav>
+  <button class="langbtn" id="langBtn" aria-label="Language">English</button>
+  <button class="cartbtn" id="openCart" aria-label="Order"><span data-i="cart">ඔබේ ඕඩර් එක</span> <b id="cartCount">0</b></button>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="hero-text">
+    <p class="si" data-i="tag"></p>
+    <h1 data-i="h1"></h1>
+    <p class="lead" data-i="lead"></p>
+    <div class="cta">
+      <a class="btn primary" href="#menu" data-i="seeMenu"></a>
+      <a class="btn ghost" id="quickWa" href="#" data-i="wa"></a>
+    </div>
+  </div>
+  <div class="plate"><img id="heroImg" src="data:," alt="Rice and curry packet with chicken curry, cashew curry, dhal, brinjal moju, salad and papadam" width="690" height="700"><span class="stamp"><span data-i="stamp"></span><b>€7</b></span></div>
+</section>
+
+<section class="menu" id="menu">
+  <div class="wrap">
+    <h2 data-i="menuH"></h2>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <h2 data-i="howH"></h2>
+    <ol>
+      <li><b data-i="s1"></b><span data-i="s1t"></span></li>
+      <li><b data-i="s2"></b><span data-i="s2t"></span></li>
+      <li><b data-i="s3"></b><span data-i="s3t"></span></li>
+    </ol>
+  </div>
+</section>
+</main>
+
+<footer id="contact">
+  <div class="wrap foot">
+    <div><b data-i="brand"></b><p data-i="fTag"></p></div>
+    <div><a class="btn primary" id="footWa" href="#" data-i="fWa"></a><p>+357 96 128522</p></div>
+  </div>
+</footer>
+
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head"><h3 data-i="oTitle"></h3><button id="closeCart" data-i="close"></button></div>
+  <div id="lines" class="lines"></div>
+  <div class="form" id="form">
+    <label><span data-i="lName"></span><input id="name" autocomplete="name" data-ph="phName"></label>
+    <fieldset><legend data-i="mode"></legend>
+      <label class="r"><input type="radio" name="mode" value="Pick-up" checked> <span data-i="pick"></span></label>
+      <label class="r"><input type="radio" name="mode" value="Delivery"> <span data-i="deliv"></span></label>
+    </fieldset>
+    <label id="addrWrap" hidden><span data-i="lAddr"></span><textarea id="addr" rows="2" data-ph="phAddr"></textarea></label>
+    <label><span data-i="lNote"></span><textarea id="note" rows="2"></textarea></label>
+    <div class="total"><span data-i="total"></span><b id="total">€0</b></div>
+    <button class="btn wa" id="send" data-i="send"></button>
+    <p class="fine" data-i="fine"></p>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+<script src="images.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
