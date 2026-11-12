@@ -92,7 +92,7 @@ function renderTabs(){
  $("#tabs").innerHTML=ids.map(c=>`<button role="tab" aria-selected="${c===tab}" data-c="${c}">${c==="all"?t("all"):t("cats")[c]}</button>`).join("");
 }
 function renderGrid(){
- $("#grid").innerHTML=MENU.filter(m=>tab==="all"||m.cat===tab).map(m=>`
+ $("#grid").innerHTML=MENU.filter(m=>tab==="all"||m.cat===tab).sort((a,b)=>(a.off?1:0)-(b.off?1:0)).map(m=>`
  <article class="card${m.off?" off":""}"><span class="badge ${m.off?"no":"yes"}" ${m.off===undefined?"hidden":""}>${m.off?t("aN"):t("aY")}</span><img src="${IMG[m.img]}" alt="${m[lang].n}" loading="lazy">
  <div class="body"><h3>${m[lang].n}</h3><span class="si2">${m[other()].n}</span><p>${m[lang].d}</p>
  <div class="buy"><span class="price">${money(m.price)}</span><button class="add" data-id="${m.id}"${m.off?" disabled":""}>${m.off?t("soldOut"):t("add")}</button></div></div></article>`).join("");
